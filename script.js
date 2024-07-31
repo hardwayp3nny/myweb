@@ -1,4 +1,4 @@
-const WORKER_URL = process.env.WORKER_URL || 'https://io-reward.2089426079.workers.dev/';
+const WORKER_URL = process.env.WORKER_URL || 'https://myweb-4pn.pages.dev/';
 
 // 其余的 JavaScript 代码...
 addEventListener('fetch', event => {
