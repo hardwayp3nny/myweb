@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>处理器回本周期计算器</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        select, input, button {
+            margin: 10px 0;
+            padding: 5px;
+            width: 100%;
+        }
+        #result {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>处理器回本周期计算器</h1>
+    <select id="processorSelect"></select>
+    <input type="number" id="price" placeholder="输入购买价格（人民币）">
+    <button onclick="calculate()">计算回本周期</button>
+    <div id="result"></div>
+
+    <script>
+        const WORKER_URL = 'https://io-reward.2089426079.workers.dev/';
+
+        async function fetchData() {
+            const response = await fetch(WORKER_URL);
+            const data = await response.json();
+            populateProcessorSelect(data.processors);
+        }
+
+        function populateProcessorSelect(processors) {
+            const select = document.getElementById('processorSelect');
+            processors.forEach(processor => {
+                const option = document.createElement('option');
+                option.value = processor.name;
+                option.textContent = processor.name;
+                select.appendChild(option);
+            });
+        }
+
+        async function calculate() {
+            const processor = document.getElementById('processorSelect').value;
+            const price = parseFloat(document.getElementById('price').value);
+
+            if (processor && price) {
+                const response = await fetch(WORKER_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ processor, price })
+                });
+                const result = await response.json();
+
+                document.getElementById('result').innerHTML = `
+                    回本周期：<br>
+                    约 ${result.paybackDays} 天<br>
+                    或 ${result.paybackMonths} 个月
+                `;
+            } else {
+                document.getElementById('result').textContent = '请选择处理器并输入有效的价格';
+            }
+        }
+
+        fetchData();
+    </script>
+</body>
+</html>
